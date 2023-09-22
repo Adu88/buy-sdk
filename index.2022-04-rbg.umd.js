@@ -1337,7 +1337,7 @@ function parseArgs(args) {
     variables = _args[1];
     selectionSetCallback = _args[2];
     internationalizationDirective = _args[3];
-  } else if (args.length === 3 && args[2].indexOf('inContext')) {
+  } else if (args.length === 3 && args[2] !== undefined && args[2].indexOf('inContext')) {
     if (Object.prototype.toString.call(args[0]) === '[object String]') {
       name = args[0];
       variables = null;
@@ -1347,9 +1347,19 @@ function parseArgs(args) {
     }
     internationalizationDirective = args[2];
     selectionSetCallback = args[1];
-  } else if (args.length === 2) {
+  } else if (args.length === 2 || (args.length === 3 && args[2] === undefined)) {
+    if (Object.prototype.toString.call(args[0]) === '[object String]') {
+        name = args[0];
+        variables = null;
+    } else if (Array.isArray(args[0])) {
+        variables = args[0];
+        name = null;
+    }
+    selectionSetCallback = args[1];
+    internationalizationDirective = null;
+  } else {
     selectionSetCallback = args[0];
-    internationalizationDirective = args[1];
+    internationalizationDirective = null;
     name = null;
   }
 
@@ -1431,7 +1441,7 @@ var Operation = function () {
     value: function toString() {
       var nameString = this.name ? ' ' + this.name : '';
 
-      return '' + this.operationType + nameString + this.variableDefinitions + this.internationalizationDirective + this.selectionSet;
+      return '' + this.operationType + nameString + this.variableDefinitions + (this.internationalizationDirective ? this.internationalizationDirective : '') + this.selectionSet;
     }
   }, {
     key: 'isAnonymous',
